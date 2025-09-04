@@ -152,4 +152,3 @@ document.addEventListener('touchmove', function(e) {
         aurora.style.transform = `translate(${x * speed * 10 - 5}px, ${y * speed * 10 - 5}px)`;
     });
 });
-

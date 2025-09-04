@@ -278,8 +278,7 @@ body {
 .nessarose-hint {
     position: absolute;
     bottom: 5%;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 10%;
     z-index: 6;
 }
 
@@ -499,7 +498,7 @@ body {
 
     .nessarose-hint {
         bottom: 1%;
-        left: 50%;
-        transform: translateX(-50%) scale(0.8);
+        left: 5%;
+        transform: scale(0.8);
     }
 }
