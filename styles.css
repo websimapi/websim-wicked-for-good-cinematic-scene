@@ -56,6 +56,39 @@ body {
     overflow: hidden;
 }
 
+.spinning-swirl {
+    position: absolute;
+    top: -50vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200vh;
+    height: 200vh;
+    background: conic-gradient(
+        from 0deg at 50% 50%,
+        transparent 0%,
+        rgba(148, 0, 211, 0.2) 25%, /* Purple */
+        rgba(255, 215, 0, 0.15) 50%, /* Gold */
+        rgba(0, 255, 100, 0.2) 75%, /* Green */
+        transparent 90%
+    );
+    border-radius: 50%;
+    mask-image: radial-gradient(circle at center, transparent 30%, black 60%);
+    -webkit-mask-image: radial-gradient(circle at center, transparent 30%, black 60%);
+    animation: spin 30s linear infinite;
+    z-index: 1;
+    mix-blend-mode: screen;
+    opacity: 0.6;
+}
+
+@keyframes spin {
+    from {
+        transform: translateX(-50%) rotate(0deg);
+    }
+    to {
+        transform: translateX(-50%) rotate(360deg);
+    }
+}
+
 /* Remove or simplify background elements that are now in the image */
 .emerald-city-skyline,
 .crumbling-platform {
