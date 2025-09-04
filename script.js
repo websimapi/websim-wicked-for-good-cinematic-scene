@@ -1,15 +1,79 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const audioConsentOverlay = document.getElementById('audio-consent-overlay');
+    const playAudioButton = document.getElementById('play-audio-button');
+
+    // --- Audio Setup ---
+    let audioContext;
+    const audioBuffers = {};
+    let backgroundMusicSource;
+    let isAudioInitialized = false;
+
+    const soundFiles = {
+        backgroundMusic: 'wicked_theme.mp3',
+        lightning: 'lightning_strike.mp3',
+        elphabaMagic: 'elphaba_magic_crackle.mp3',
+        glindaMagic: 'glinda_shimmer.mp3',
+        wizardMagic: 'wizard_deception.mp3',
+        dorothyMagic: 'dorothy_wonder.mp3'
+    };
+
+    async function initAudio() {
+        if (isAudioInitialized) return;
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Load all audio files
+        const promises = Object.entries(soundFiles).map(async ([name, path]) => {
+            const response = await fetch(path);
+            const arrayBuffer = await response.arrayBuffer();
+            audioBuffers[name] = await audioContext.decodeAudioData(arrayBuffer);
+        });
+
+        await Promise.all(promises);
+        isAudioInitialized = true;
+        console.log('Audio initialized');
+
+        playBackgroundMusic();
+    }
+
+    function playSound(bufferName, loop = false) {
+        if (!isAudioInitialized || !audioBuffers[bufferName]) return null;
+
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffers[bufferName];
+        source.connect(audioContext.destination);
+        source.loop = loop;
+        source.start(0);
+        return source;
+    }
+
+    function playBackgroundMusic() {
+        if (backgroundMusicSource) {
+            backgroundMusicSource.stop();
+        }
+        backgroundMusicSource = playSound('backgroundMusic', true);
+    }
+    
+    playAudioButton.addEventListener('click', () => {
+        initAudio();
+        audioConsentOverlay.style.display = 'none';
+    });
+
     // Create magical particles
     createMagicalParticles();
     
     // Add touch interactions for mobile
-    addTouchInteractions();
+    addTouchInteractions(playSound);
     
     // Dynamic lightning
-    scheduleLightning();
+    scheduleLightning(playSound);
     
     // Character animations
     animateCharacters();
+
+    // Start Elphaba's magic sound loop after a delay
+    setTimeout(() => {
+        const elphabaSound = playSound('elphabaMagic', true);
+    }, 1000);
 });
 
 function createMagicalParticles() {
@@ -54,7 +118,21 @@ function createMagicalParticles() {
     document.head.appendChild(style);
 }
 
-function addTouchInteractions() {
+function addTouchInteractions(playSound) {
+    const characterInteractions = {
+        'glinda': 'glindaMagic',
+        'dorothy': 'dorothyMagic',
+        'wizard': 'wizardMagic'
+    };
+
+    for (const [id, soundName] of Object.entries(characterInteractions)) {
+        const characterEl = document.getElementById(id);
+        if (characterEl) {
+            characterEl.addEventListener('click', () => playSound(soundName));
+            characterEl.addEventListener('touchstart', () => playSound(soundName));
+        }
+    }
+    
     const characters = document.querySelectorAll('.character');
     
     characters.forEach(character => {
@@ -109,13 +187,14 @@ function addTouchInteractions() {
     document.head.appendChild(style);
 }
 
-function scheduleLightning() {
+function scheduleLightning(playSound) {
     setInterval(() => {
         if (Math.random() > 0.7) {
             const flash = document.querySelector('.lightning-flash');
             flash.style.animation = 'none';
             flash.offsetHeight; // Trigger reflow
             flash.style.animation = 'lightning 1s ease-out';
+            playSound('lightning');
         }
     }, 3000);
 }
